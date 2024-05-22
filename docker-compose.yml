@@ -1,0 +1,46 @@
+version: "3.6"
+
+networks:
+    bravi:
+        driver: bridge
+
+services:
+    #
+    db:
+        container_name: bravi_db
+        image: postgres
+        networks:
+            - bravi
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_PASSWORD=bravi
+            - POSTGRES_USER=bravi
+            - POSTGRES_DB=bravi
+
+    #
+    api:
+        container_name: bravi_api
+        build: ./api/
+        networks:
+            - bravi
+        volumes:
+            - ./api/:/var/www/html/
+        ports:
+            - 8000:80
+        depends_on:
+            - db
+
+    #
+    front:
+        container_name: bravi_front
+        build: ./front/
+        volumes:
+            - ./front/:/usr/src/app/
+        networks:
+            - bravi
+        ports:
+            - 3000:4200
+        depends_on:
+            - db
+
